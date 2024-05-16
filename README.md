@@ -6,20 +6,10 @@
 ### 安装FUSE
 首先，确保你的系统已经安装了FUSE。你可以使用包管理器来安装：
 
-对于Debian/Ubuntu系统：
+对于Ubuntu系统：
 ```bash
 sudo apt-get update
 sudo apt-get install fuse
-```
-
-对于Red Hat/CentOS系统：
-```bash
-sudo yum install fuse
-```
-
-对于Arch Linux系统：
-```bash
-sudo pacman -S fuse
 ```
 
 ### 确保内核模块已加载
