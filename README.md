@@ -214,7 +214,12 @@ gcc -Wall hello.c `pkg-config fuse --cflags --libs` -o hello
 ```bash
 ./hello /mnt/myssd
 ```
-
+此时会出现这个提示：
+![image](https://github.com/lus-oa/FUSE-over-SSD/assets/122666739/388bd4b8-de7e-4913-a8b7-c84c7fbb6fb3)  
+在后边加上`-o nonempty`参数：
+```bash
+./hello /mnt/myssd -o nonempty
+```
 
 
 现在，你可以在`/mnt/hello`目录中看到一个虚拟的文件系统，包含一个`hello`文件。
