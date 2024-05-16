@@ -214,12 +214,55 @@ gcc -Wall hello.c `pkg-config fuse --cflags --libs` -o hello
 ```bash
 ./hello /mnt/myssd
 ```
-此时会出现这个提示：
+此时会出现报这个错误：  
+
 ![image](https://github.com/lus-oa/FUSE-over-SSD/assets/122666739/388bd4b8-de7e-4913-a8b7-c84c7fbb6fb3)  
+
 在后边加上`-o nonempty`参数：
 ```bash
 ./hello /mnt/myssd -o nonempty
 ```
+之后会继续报错：  
+![image](https://github.com/lus-oa/FUSE-over-SSD/assets/122666739/e0c6003e-4912-408c-992d-af61f8f075ea)  
+
+这个错误表明当前用户没有对挂载点 `/mnt/myssd` 的写权限。为了挂载 FUSE 文件系统，用户需要对挂载点有写权限。
+
+以下是解决这个问题的步骤：
+
+##### 1. 确认当前用户
+首先，确认你当前的用户。你可以通过以下命令查看当前用户：
+```bash
+whoami
+```
+
+##### 2. 修改挂载点的权限
+确保当前用户对挂载点 `/mnt/myssd` 具有写权限。假设你的用户名是 `yourusername`，你可以使用以下命令来修改挂载点的所有权和权限：
+
+```bash
+sudo chown yourusername:yourusername /mnt/myssd
+sudo chmod u+w /mnt/myssd
+```
+
+将 `yourusername` 替换为你的实际用户名。
+
+###### 3. 挂载文件系统
+然后尝试再次挂载 FUSE 文件系统：
+
+```bash
+./hello /mnt/myssd
+```
+
+或使用 `nonempty` 选项（如果目录非空）：
+
+```bash
+./hello /mnt/myssd -o nonempty
+```
+
+![image](https://github.com/lus-oa/FUSE-over-SSD/assets/122666739/5863aad4-5440-4a25-afc5-a75c6933804d)
+
+
+通过这些步骤，你应该能够成功挂载 FUSE 文件系统到你的固态硬盘上。
+
 
 
 现在，你可以在`/mnt/hello`目录中看到一个虚拟的文件系统，包含一个`hello`文件。
