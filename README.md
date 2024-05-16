@@ -49,25 +49,6 @@ sudo mkdir /mnt/myssd
 sudo mount /dev/nvme0n1 /mnt/myssd
 ```
 
-### 使用FUSE文件系统
-假设你有一个FUSE文件系统，比如[SSHFS](https://github.com/libfuse/sshfs)，你可以安装并使用它。
-
-#### 1. 安装SSHFS
-```bash
-sudo apt-get install sshfs
-```
-
-#### 2. 使用SSHFS挂载远程目录到本地
-创建一个目录作为挂载点：
-```bash
-mkdir ~/myremote
-```
-
-挂载远程目录：
-```bash
-sshfs user@remotehost:/path/to/remote/dir ~/myremote
-```
-
 ### 自定义FUSE文件系统
 如果你要开发自定义的FUSE文件系统，可以参考以下步骤：
 
@@ -228,15 +209,13 @@ gcc -Wall hello.c `pkg-config fuse --cflags --libs` -o hello
 ```
 
 #### 3. 运行FUSE文件系统
-创建一个挂载点：
-```bash
-mkdir /mnt/hello
-```
 
 运行FUSE文件系统：
 ```bash
-./hello /mnt/hello
+./hello /mnt/myssd
 ```
+
+
 
 现在，你可以在`/mnt/hello`目录中看到一个虚拟的文件系统，包含一个`hello`文件。
 
