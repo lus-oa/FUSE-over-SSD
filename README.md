@@ -17,6 +17,10 @@ sudo apt-get install fuse
 ```bash
 sudo modprobe fuse
 ```
+### 查看安装的FUSE版本
+```bash
+fusermount -V
+```
 
 ### 格式化并挂载SSD
 假设你要使用FUSE文件系统来操作一个已经存在的文件系统或创建一个新的文件系统在SSD上，你需要先进行格式化并挂载：
