@@ -53,7 +53,7 @@ sudo apt-get install libfuse-dev
 ```
 
 #### 2. 编写FUSE程序
-编写一个简单的FUSE程序。例如，创建一个名为`hello.c`的文件：
+编写一个简单的FUSE程序。例如，创建一个名为`lxcfs.c`的文件：
 ```c
 #define FUSE_USE_VERSION 30
 
@@ -85,7 +85,7 @@ static int find_file(const char *name) {
     return -1;
 }
 
-static int hello_getattr(const char *path, struct stat *stbuf) {
+static int lxc_getattr(const char *path, struct stat *stbuf) {
     memset(stbuf, 0, sizeof(struct stat));
     if (strcmp(path, "/") == 0) {
         stbuf->st_mode = S_IFDIR | 0755;
@@ -103,7 +103,7 @@ static int hello_getattr(const char *path, struct stat *stbuf) {
     return 0;
 }
 
-static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
+static int lxc_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                          off_t offset, struct fuse_file_info *fi) {
     (void) offset;
     (void) fi;
@@ -120,14 +120,14 @@ static int hello_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     return 0;
 }
 
-static int hello_open(const char *path, struct fuse_file_info *fi) {
+static int lxc_open(const char *path, struct fuse_file_info *fi) {
     if (find_file(path + 1) == -1) { // Skip leading '/'
         return -ENOENT;
     }
     return 0;
 }
 
-static int hello_read(const char *path, char *buf, size_t size, off_t offset,
+static int lxc_read(const char *path, char *buf, size_t size, off_t offset,
                       struct fuse_file_info *fi) {
     int idx = find_file(path + 1); // Skip leading '/'
     if (idx == -1) {
@@ -145,7 +145,7 @@ static int hello_read(const char *path, char *buf, size_t size, off_t offset,
     return size;
 }
 
-static int hello_write(const char *path, const char *buf, size_t size, off_t offset,
+static int lxc_write(const char *path, const char *buf, size_t size, off_t offset,
                        struct fuse_file_info *fi) {
     int idx = find_file(path + 1); // Skip leading '/'
     if (idx == -1) {
@@ -169,7 +169,7 @@ static int hello_write(const char *path, const char *buf, size_t size, off_t off
     return size;
 }
 
-static int hello_unlink(const char *path) {
+static int lxc_unlink(const char *path) {
     int idx = find_file(path + 1); // Skip leading '/'
     if (idx == -1) {
         return -ENOENT;
@@ -182,31 +182,31 @@ static int hello_unlink(const char *path) {
     return 0;
 }
 
-static struct fuse_operations hello_oper = {
-    .getattr = hello_getattr,
-    .readdir = hello_readdir,
-    .open    = hello_open,
-    .read    = hello_read,
-    .write   = hello_write,
-    .unlink  = hello_unlink,
+static struct fuse_operations lxc_oper = {
+    .getattr = lxc_getattr,
+    .readdir = lxc_readdir,
+    .open    = lxc_open,
+    .read    = lxc_read,
+    .write   = lxc_write,
+    .unlink  = lxc_unlink,
 };
 
 int main(int argc, char *argv[]) {
-    return fuse_main(argc, argv, &hello_oper, NULL);
+    return fuse_main(argc, argv, &lxc_oper, NULL);
 }
 
 ```
 
 编译FUSE程序：
 ```bash
-gcc -Wall hello.c `pkg-config fuse --cflags --libs` -o hello
+gcc -Wall lxcfs.c `pkg-config fuse --cflags --libs` -o lxcfs
 ```
 
 #### 3. 运行FUSE文件系统
 
 运行FUSE文件系统：
 ```bash
-./hello /mnt/myssd
+./lxcfs /mnt/myssd
 ```
 此时会出现报这个错误：  
 
@@ -214,7 +214,7 @@ gcc -Wall hello.c `pkg-config fuse --cflags --libs` -o hello
 
 在后边加上`-o nonempty`参数：
 ```bash
-./hello /mnt/myssd -o nonempty
+./lxcfs /mnt/myssd -o nonempty
 ```
 之后会继续报错：  
 ![image](https://github.com/lus-oa/FUSE-over-SSD/assets/122666739/e0c6003e-4912-408c-992d-af61f8f075ea)  
@@ -243,13 +243,13 @@ sudo chmod u+w /mnt/myssd
 然后尝试再次挂载 FUSE 文件系统：
 
 ```bash
-./hello /mnt/myssd
+./lxcfs /mnt/myssd
 ```
 
 或使用 `nonempty` 选项（如果目录非空）：
 
 ```bash
-./hello /mnt/myssd -o nonempty
+./lxcfs /mnt/myssd -o nonempty
 ```
 
 ![image](https://github.com/lus-oa/FUSE-over-SSD/assets/122666739/5863aad4-5440-4a25-afc5-a75c6933804d)
@@ -259,7 +259,7 @@ sudo chmod u+w /mnt/myssd
 
 
 
-现在，你可以在`/mnt/myssd`目录中看到一个虚拟的文件系统，包含一个`hello`文件。
+现在，你可以在`/mnt/myssd`目录中看到一个虚拟的文件系统，包含一个`lxc`文件。
 
 这些步骤应帮助你在Linux系统上使用FUSE文件系统，并操作SSD设备`/dev/nvme0n1`。根据你的具体需求，你可能需要调整某些步骤或使用不同的FUSE文件系统。
 
@@ -274,9 +274,9 @@ ls /mnt/myssd
 ```
 
 #### 读取文件内容
-查看文件内容（假设你在FUSE文件系统中有一个`hello`文件）：
+查看文件内容（假设你在FUSE文件系统中有一个`lxc`文件）：
 ```bash
-cat /mnt/myssd/hello
+cat /mnt/myssd/lxc
 ```
 
 #### 创建新文件
@@ -310,8 +310,8 @@ cd /mnt/myssd
 # 列出文件
 ls /mnt/myssd
 
-# 查看hello文件内容
-cat /mnt/myssd/hello
+# 查看lxc文件内容
+cat /mnt/myssd/lxc
 
 # 创建一个新文件
 echo "This is a test file" > /mnt/myssd/testfile
@@ -336,14 +336,14 @@ fusermount -u /mnt/myssd
 在挂载时可以指定一些FUSE特定的选项，比如`allow_other`允许其他用户访问挂载的文件系统：
 
 ```bash
-./hello /mnt/myssd -o allow_other
+./lxcfs /mnt/myssd -o allow_other
 ```
 
 #### 3. 调试信息
 如果你在开发或调试FUSE文件系统，可以使用`-d`选项启动调试模式：
 
 ```bash
-./hello /mnt/myssd -d
+./lxcfs /mnt/myssd -d
 ```
 
 ### 处理权限问题
