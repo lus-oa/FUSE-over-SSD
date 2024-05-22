@@ -199,14 +199,14 @@ int main(int argc, char *argv[]) {
 
 编译FUSE程序：
 ```bash
-gcc -Wall hellofs.c `pkg-config fuse --cflags --libs` -o hellofs
+gcc -Wall hello.c `pkg-config fuse --cflags --libs` -o hello
 ```
 
 #### 3. 运行FUSE文件系统
 
 运行FUSE文件系统：
 ```bash
-./hellofs /mnt/myssd
+./hello /mnt/myssd
 ```
 此时会出现报这个错误：  
 
@@ -214,7 +214,7 @@ gcc -Wall hellofs.c `pkg-config fuse --cflags --libs` -o hellofs
 
 在后边加上`-o nonempty`参数：
 ```bash
-./hellofs /mnt/myssd -o nonempty
+./hello /mnt/myssd -o nonempty
 ```
 之后会继续报错：  
 ![image](https://github.com/lus-oa/FUSE-over-SSD/assets/122666739/e0c6003e-4912-408c-992d-af61f8f075ea)  
@@ -243,13 +243,13 @@ sudo chmod u+w /mnt/myssd
 然后尝试再次挂载 FUSE 文件系统：
 
 ```bash
-./hellofs /mnt/myssd
+./hello /mnt/myssd
 ```
 
 或使用 `nonempty` 选项（如果目录非空）：
 
 ```bash
-./hellofs /mnt/myssd -o nonempty
+./hello /mnt/myssd -o nonempty
 ```
 
 ![image](https://github.com/lus-oa/FUSE-over-SSD/assets/122666739/5863aad4-5440-4a25-afc5-a75c6933804d)
@@ -336,14 +336,14 @@ fusermount -u /mnt/myssd
 在挂载时可以指定一些FUSE特定的选项，比如`allow_other`允许其他用户访问挂载的文件系统：
 
 ```bash
-./hellofs /mnt/myssd -o allow_other
+./hello /mnt/myssd -o allow_other
 ```
 
 #### 3. 调试信息
 如果你在开发或调试FUSE文件系统，可以使用`-d`选项启动调试模式：
 
 ```bash
-./hellofs /mnt/myssd -d
+./hello /mnt/myssd -d
 ```
 
 ### 处理权限问题
