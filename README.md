@@ -350,3 +350,59 @@ fusermount -u /mnt/myssd
 如果在使用过程中遇到权限问题，可以尝试使用`sudo`命令或者调整文件系统的权限。
 
 通过这些操作，你可以与挂载的FUSE文件系统进行交互，并根据需要执行各种文件操作。如果你有特定的FUSE文件系统实现（如SSHFS），它可能会提供更多特定的命令和选项。
+
+
+
+要跟踪执行 `./hello /mnt/myssd` 挂载 FUSE 文件系统时触发了哪些 FUSE 内核函数，你可以使用以下方法：
+
+1. **使用 `strace` 跟踪系统调用**：
+   `strace` 是一个调试工具，用于监视由程序执行的系统调用和接收的信号。你可以使用 `strace` 来跟踪 FUSE 应用程序与内核之间的交互。
+
+   ```bash
+   sudo strace -f -e trace=file,desc,network ./hello /mnt/myssd
+   ```
+
+   这将显示所有与文件、描述符和网络相关的系统调用，包括 FUSE 文件系统的挂载过程。
+
+2. **查看内核日志**：
+   使用 `dmesg` 查看内核日志，以监控与 FUSE 相关的内核事件。
+
+   ```bash
+   dmesg | grep fuse
+   ```
+
+   挂载 FUSE 文件系统时，FUSE 驱动程序通常会在内核日志中生成一些输出。你可以在挂载操作前后运行 `dmesg` 来捕捉这些日志。
+
+3. **启用 FUSE 调试输出**：
+   许多 FUSE 文件系统实现提供调试选项，可以在挂载时启用调试输出。通常，这可以通过 `-d` 或 `-odebug` 选项实现。例如：
+
+   ```bash
+   ./hello -d /mnt/myssd
+   ```
+
+   或者
+
+   ```bash
+   ./hello -o debug /mnt/myssd
+   ```
+
+   这将启用 FUSE 文件系统的调试输出，并在终端显示详细的调试信息。
+
+4. **使用 `fusemon` 工具**：
+   `fusemon` 是一个专门用于监控 FUSE 文件系统活动的工具。你可以在系统中安装 `fusemon` 并使用它来跟踪 FUSE 文件系统的操作。
+
+   ```bash
+   sudo apt-get install fusemon
+   sudo fusemon /mnt/myssd
+   ```
+
+   这将监控并显示与指定挂载点相关的 FUSE 活动。
+
+总结：
+
+- 使用 `strace` 跟踪系统调用。
+- 查看内核日志 (`dmesg`) 中的 FUSE 相关输出。
+- 启用 FUSE 文件系统的调试输出。
+- 使用 `fusemon` 工具监控 FUSE 活动。
+
+通过这些方法，你可以详细跟踪挂载 FUSE 文件系统时触发的内核函数和相关活动。
